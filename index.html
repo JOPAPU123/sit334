@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>КОСЫЦЯ — ПИЗДЕЦ И ХАОС</title>
+    <style>
+        body {
+            background: #000;
+            margin: 0;
+            overflow: hidden;
+            color: #ff0000;
+            font-family: 'Impact', sans-serif;
+        }
+        .main-content {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+        img.troll {
+            position: absolute;
+            width: 100px;
+            z-index: 50;
+        }
+        h1 { font-size: 6rem; text-shadow: 0 0 20px #f00; animation: flash 0.1s infinite; }
+        .mat-text { font-size: 2rem; color: #fff; }
+        @keyframes flash { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="main-content">
+        <h1>КОСЫЦЯ</h1>
+        <div class="mat-text">
+            <p>ЭТОТ ЕБАНЫЙ ТИП ВЛАСТЕЛИН ХАОСА</p>
+            <p>ВСЕ ОСТАЛЬНЫЕ — ПОЛНАЯ ХУЙНЯ И ПИЗДАБОЛЫ</p>
+        </div>
+    </div>
+
+    <!-- Твой аватар в центре -->
+    <img src="image_507512.png" style="position:absolute; top:40%; left:45%; width:150px; border: 5px solid red; z-index: 99;">
+
+    <script>
+        const trolls = [];
+        for (let i = 0; i < 4; i++) {
+            let img = document.createElement('img');
+            img.src = 'troll.png';
+            img.className = 'troll';
+            document.body.appendChild(img);
+            trolls.push({
+                el: img,
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                vx: (Math.random() - 0.5) * 20,
+                vy: (Math.random() - 0.5) * 20
+            });
+        }
+
+        function animate() {
+            trolls.forEach(t => {
+                t.x += t.vx; t.y += t.vy;
+                if (t.x < 0 || t.x > window.innerWidth - 100) t.vx *= -1;
+                if (t.y < 0 || t.y > window.innerHeight - 100) t.vy *= -1;
+                t.el.style.left = t.x + 'px';
+                t.el.style.top = t.y + 'px';
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
