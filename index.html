@@ -90,10 +90,8 @@
             gap:8px;
         }
         .btn:hover{transform:translateY(-3px); box-shadow:0 8px 20px rgba(0,0,0,0.6)}
-        /* floating trolls container (uses absolute-positioned imgs) */
         .scene{ position:fixed; inset:0; pointer-events:none; z-index:1; }
-        .troll-sprite{ position:absolute; width:100px; height:100px; transform:translate(-50%,-50%); will-change:transform; filter:drop-shadow(0 8px 20px rgba(0,0,0,0.7)); }
-        /* small screens make layout cozy */
+        .troll-sprite{ position:absolute; width:100px; height:100px; will-change:transform; filter:drop-shadow(0 8px 20px rgba(0,0,0,0.7)); }
         @media (max-width:480px){
             .card{ padding:18px }
             .mat-text{ font-size:1rem }
@@ -114,7 +112,6 @@
                 <p>дана давай ты будешь слушать кальянный реп уже</p>
             </div>
 
-            <!-- Твой аватар под текстом -->
             <img src="image_507512.png" class="avatar" alt="Аватар">
         </main>
     </div>
@@ -123,97 +120,75 @@
     <footer>Сделано лучше — готово к правкам и локализации</footer>
 
     <script>
-        // Scene and sprites
         const scene = document.getElementById('scene');
         const TROLL_SRC = 'troll.png';
-        const NUM = 4; // number of sprites (changed to 4)
+        const NUM = 4;
         const sprites = [];
 
-        function randRange(min, max){ return min + Math.random() * (max - min); }
+        function randRange(min, max){ 
+            let val = min + Math.random() * (max - min);
+            return (val < 1 && val > -1) ? (val >= 0 ? 2 : -2) : val;
+        }
 
         function createSprites(){
             scene.innerHTML = '';
-            sprites.length = 0;
-            for(let i=0;i<NUM;i++){
+            for(let i=0; i<NUM; i++){
                 const img = document.createElement('img');
                 img.src = TROLL_SRC;
                 img.className = 'troll-sprite';
                 img.alt = '';
-                // choose width and height (square sprites)
-                const w = 80 + Math.random()*140;
+                
+                const w = 80 + Math.random() * 80;
                 img.style.width = w + 'px';
                 img.style.height = w + 'px';
 
-                // start positions: keep inside viewport margins so they spawn visible
-                const margin = 50;
-                const x = margin + Math.random() * Math.max(0, innerWidth - margin*2);
-                const y = margin + Math.random() * Math.max(0, innerHeight - margin*2);
-                img.style.left = x + 'px';
-                img.style.top = y + 'px';
-
+                // Random spawn
+                let x = Math.random() * (window.innerWidth - w);
+                let y = Math.random() * (window.innerHeight - w);
+                
+                sprites.push({
+                    el: img,
+                    x: x,
+                    y: y,
+                    vx: randRange(-4, 4),
+                    vy: randRange(-4, 4),
+                    w: w
+                });
                 scene.appendChild(img);
-
-                // random velocity, ensure not too small
-                const vx = randRange(-4.5, 4.5);
-                const vy = randRange(-4.5, 4.5);
-
-                sprites.push({el:img,x,y,vx,vy,rot: randRange(0,360), rotV: randRange(-1.2,1.2), w});
             }
         }
 
         createSprites();
 
-        let running = true; // always running
-
         function step(){
-            if(running){
-                for(const s of sprites){
-                    s.x += s.vx; s.y += s.vy; s.rot += s.rotV;
+            for(const s of sprites){
+                s.x += s.vx;
+                s.y += s.vy;
 
-                    // use actual size to compute bounce boundaries
-                    const w = s.el.offsetWidth || s.w || 100;
-                    const h = s.el.offsetHeight || w;
-                    const halfW = w/2;
-                    const halfH = h/2;
+                // Bounce borders
+                if(s.x <= 0 || s.x + s.w >= window.innerWidth) s.vx *= -1;
+                if(s.y <= 0 || s.y + s.w >= window.innerHeight) s.vy *= -1;
 
-                    // left
-                    if(s.x - halfW < 0){
-                        s.x = halfW;
-                        s.vx = Math.abs(s.vx) * 0.98; // bounce and damp slightly
-                    }
-                    // right
-                    if(s.x + halfW > innerWidth){
-                        s.x = innerWidth - halfW;
-                        s.vx = -Math.abs(s.vx) * 0.98;
-                    }
-                    // top
-                    if(s.y - halfH < 0){
-                        s.y = halfH;
-                        s.vy = Math.abs(s.vy) * 0.98;
-                    }
-                    // bottom
-                    if(s.y + halfH > innerHeight){
-                        s.y = innerHeight - halfH;
-                        s.vy = -Math.abs(s.vy) * 0.98;
-                    }
+                // Clamp to ensure they don't get stuck
+                if(s.x < 0) s.x = 0;
+                if(s.x > window.innerWidth - s.w) s.x = window.innerWidth - s.w;
+                if(s.y < 0) s.y = 0;
+                if(s.y > window.innerHeight - s.w) s.y = window.innerHeight - s.w;
 
-                    // apply transform (centered)
-                    s.el.style.transform = `translate(${s.x}px, ${s.y}px) translate(-50%,-50%) rotate(${s.rot}deg)`;
-                }
+                s.el.style.transform = `translate(${s.x}px, ${s.y}px)`;
             }
             requestAnimationFrame(step);
         }
+        
         requestAnimationFrame(step);
 
-        // Resize handling
-        window.addEventListener('resize', ()=>{
-            // keep sprites inside
+        window.addEventListener('resize', () => {
+            // Reposition if resize makes them go out of bounds
             for(const s of sprites){
-                s.x = Math.min(Math.max(s.x, 0), innerWidth);
-                s.y = Math.min(Math.max(s.y, 0), innerHeight);
+                if(s.x > window.innerWidth - s.w) s.x = window.innerWidth - s.w;
+                if(s.y > window.innerHeight - s.w) s.y = window.innerHeight - s.w;
             }
         });
-
     </script>
 </body>
 </html>
