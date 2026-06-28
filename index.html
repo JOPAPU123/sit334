@@ -10,22 +10,15 @@
             overflow: hidden;
             color: #ff0000;
             font-family: 'Impact', sans-serif;
+            text-align: center;
         }
         .main-content {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
+            padding-top: 50px;
             z-index: 100;
-            pointer-events: none;
         }
-        img.troll {
-            position: absolute;
-            width: 100px;
-            z-index: 50;
-        }
-        h1 { font-size: 6rem; text-shadow: 0 0 20px #f00; animation: flash 0.1s infinite; }
-        .mat-text { font-size: 2rem; color: #fff; }
+        h1 { font-size: 6rem; text-shadow: 0 0 20px #f00; animation: flash 0.1s infinite; margin: 0; }
+        .mat-text { font-size: 2rem; color: #fff; margin-top: 10px; }
+        img.troll { position: absolute; width: 100px; z-index: 50; }
         @keyframes flash { 0% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
@@ -39,8 +32,8 @@
         </div>
     </div>
 
-    <!-- Твой аватар в центре -->
-    <img src="image_507512.png" style="position:absolute; top:40%; left:45%; width:150px; border: 5px solid red; z-index: 99;">
+    <!-- Твой аватар под текстом -->
+    <img src="image_507512.png" style="margin-top: 50px; width:150px; border: 5px solid red; z-index: 99; position: relative;">
 
     <script>
         const trolls = [];
