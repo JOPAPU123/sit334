@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>КОСЫЦЯ — ПИЗДЕЦ И ХАОС</title>
-    <meta name="description" content="Улучшенная демонстрационная страница с анимацией и аватаром (оригинальный текст сохранён)">
+    <meta name="description" content="Улучшенная демонстрационная страница с анимацией и аватаром">
     <style>
         :root{
             --bg1:#050005;
@@ -75,7 +75,6 @@
             width: clamp(90px, 12vw, 180px);
             height: auto;
         }
-        .controls{margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
         .btn{
             background:transparent;
             border:2px solid rgba(255,255,255,0.08);
@@ -94,14 +93,9 @@
         /* floating trolls container (uses absolute-positioned imgs) */
         .scene{ position:fixed; inset:0; pointer-events:none; z-index:1; }
         .troll-sprite{ position:absolute; width:100px; height:100px; transform:translate(-50%,-50%); will-change:transform; filter:drop-shadow(0 8px 20px rgba(0,0,0,0.7)); }
-        /* accessibility: respect reduced motion */
-        @media (prefers-reduced-motion: reduce){
-            .troll-sprite{ transition:none !important; animation:none !important; }
-        }
         /* small screens make layout cozy */
         @media (max-width:480px){
             .card{ padding:18px }
-            .controls{ gap:8px }
             .mat-text{ font-size:1rem }
         }
         footer{ position:fixed; left:12px; bottom:12px; color:#fff; opacity:0.5; font-size:.9rem; z-index:12 }
@@ -122,12 +116,6 @@
 
             <!-- Твой аватар под текстом -->
             <img src="image_507512.png" class="avatar" alt="Аватар">
-
-            <div class="controls">
-                <button class="btn" id="toggle-motion">Отключить анимацию</button>
-                <button class="btn" id="shuffle-trolls">Перемешать троллей</button>
-                <a class="btn" href="#" id="download">Скачать страницу</a>
-            </div>
         </main>
     </div>
 
@@ -135,9 +123,6 @@
     <footer>Сделано лучше — готово к правкам и локализации</footer>
 
     <script>
-        // Preferences
-        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
         // Scene and sprites
         const scene = document.getElementById('scene');
         const TROLL_SRC = 'troll.png';
@@ -159,13 +144,13 @@
                 img.style.top = y + 'px';
                 img.style.width = (80 + Math.random()*140) + 'px';
                 scene.appendChild(img);
-                sprites.push({el:img,x,y,vx:(Math.random()-0.5)*2.8, vy:(Math.random()-0.5)*2.8, rot: Math.random()*360, rotV:(Math.random()-0.5)*0.6});
+                sprites.push({el:img,x,y,vx:(Math.random()-0.5)*5.6, vy:(Math.random()-0.5)*5.6, rot: Math.random()*360, rotV:(Math.random()-0.5)*1.2});
             }
         }
 
         createSprites();
 
-        let running = !prefersReduced; // if user prefers reduced motion, start paused
+        let running = true; // always running
 
         function step(){
             if(running){
@@ -184,31 +169,6 @@
         }
         requestAnimationFrame(step);
 
-        // Controls
-        const btnMotion = document.getElementById('toggle-motion');
-        btnMotion.addEventListener('click', ()=>{
-            running = !running;
-            btnMotion.textContent = running ? 'Отключить анимацию' : 'Включить анимацию';
-        });
-
-        document.getElementById('shuffle-trolls').addEventListener('click', ()=>{
-            for(const s of sprites){
-                s.x = Math.random()*innerWidth; s.y = Math.random()*innerHeight;
-                s.vx = (Math.random()-0.5)*3; s.vy = (Math.random()-0.5)*3; s.rotV = (Math.random()-0.5)*0.7;
-            }
-        });
-
-        // Download page as HTML (simple client-side snapshot)
-        document.getElementById('download').addEventListener('click', (e)=>{
-            e.preventDefault();
-            const blob = new Blob([document.documentElement.outerHTML], {type:'text/html'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = 'index.html';
-            document.body.appendChild(a); a.click(); a.remove();
-            URL.revokeObjectURL(url);
-        });
-
         // Resize handling
         window.addEventListener('resize', ()=>{
             // keep sprites inside
@@ -217,11 +177,6 @@
                 s.y = Math.min(Math.max(s.y, -200), innerHeight+200);
             }
         });
-
-        // Accessibility: if reduced motion is preferred, update button
-        if(prefersReduced){
-            btnMotion.textContent = 'Анимация отключена (prefers-reduced-motion)';
-        }
 
     </script>
 </body>
